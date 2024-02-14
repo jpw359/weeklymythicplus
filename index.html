@@ -29,7 +29,7 @@ body {
 
 </head>
 <body>
-<h1>Enter Character and Server Information</h1>
+<h1></h1>
 <div id="characterInputs"></div>
 <button onclick="getWeeklyBestDungeons()">Get Weekly Top 8 Dungeons</button>
 <div id="results"></div>
@@ -55,9 +55,9 @@ function createCharacterInputs() {
 
     characterInputs.innerHTML += `
       <div>
-        <label for="characterName${i}">Character Name:</label>
+        <label for="characterName${i}">Character:</label>
         <input type="text" id="characterName${i}" value="${characterName}">
-        <label for="serverName${i}">Server Name:</label>
+        <label for="serverName${i}">Server:</label>
         <input type="text" id="serverName${i}" value="${serverName}">
       </div>
     `;
