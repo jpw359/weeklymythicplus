@@ -1,113 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Top 8 Weekly Dungeons</title>
-<style>
-body {
-	font-family: Arial, sans-serif;
-	background-color: #333; /* Dark grey background color */
-	color: #fff; /* Text color to contrast with the dark background */
-	justify-content: center;
-	max-width: 30%;
-	margin: auto;
-}
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Top 8 Weekly Dungeons</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #44546A /* Dark grey background color */
+			color: #fff; /* Text color to contrast with the dark background */
+			justify-content: center;
+			max-width: 30%;
+			margin: auto;
+		}
 
+		.m11, .m12, .m13, .m14, .m15, .m16 {
+			background-color: lightblue;
+			width: 20em;
+		}
 
-
-  .m11, .m12, .m13, .m14, .m15, .m16 {
-    background-color: lightblue;
-	width: 20em;
-  }
-
-  .m16, .m18, .m19, .m20, .m21, .m22, .m23, .m24, .m25, .m26, .m27, .m28, .m29, .m30, .m31, .m32, .m34, .m35 {
-    background-color: orange;
-	width: 20em;
-  }
-</style>
-
+		.m16, .m18, .m19, .m20, .m21, .m22, .m23, .m24, .m25, .m26, .m27, .m28, .m29, .m30, .m31, .m32, .m34, .m35 {
+			background-color: orange;
+			width: 20em;
+		}
+	</style>
 </head>
 <body>
-<h1></h1>
-<div id="characterInputs"></div>
-<button onclick="getWeeklyBestDungeons()">Get Weekly Top 8 Dungeons</button>
-<div id="results"></div>
+	<div id="characterInputs"></div>
+		<button onclick="getWeeklyBestDungeons()">Get Weekly Top 8 Dungeons</button>
+	<div id="results"></div>
+	
+	<script>
+		function setCookie(name, value) {
+			document.cookie = `${name}=${value};expires=${new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString()};`;
+		}
 
-<script>
+		function getCookie(name) {
+			const cookieValue = document.cookie.match(`(^|;)\\s*${name}=([^;]+)`);
+			return cookieValue ? cookieValue.pop() : '';
+		}
 
+		function createCharacterInputs() {
+			const characterInputs = document.getElementById('characterInputs');
 
-function setCookie(name, value) {
-  document.cookie = `${name}=${value};expires=${new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString()};`;
-}
+			for (let i = 0; i < 10; i++) {
+				const characterName = getCookie(`characterName${i}`) || '';
+				const serverName = getCookie(`serverName${i}`) || '';
 
-function getCookie(name) {
-  const cookieValue = document.cookie.match(`(^|;)\\s*${name}=([^;]+)`);
-  return cookieValue ? cookieValue.pop() : '';
-}
+				characterInputs.innerHTML += `<div><label for="characterName${i}">Character:</label><input type="text" id="characterName${i}" value="${characterName}"><label for="serverName${i}">Server:</label><input type="text" id="serverName${i}" value="${serverName}"></div>`;
+			}
+		}
 
-function createCharacterInputs() {
-  const characterInputs = document.getElementById('characterInputs');
+		createCharacterInputs();
 
-  for (let i = 0; i < 10; i++) {
-    const characterName = getCookie(`characterName${i}`) || '';
-    const serverName = getCookie(`serverName${i}`) || '';
+		async function getWeeklyBestDungeons() {
+			const results = document.getElementById('results');
+			results.innerHTML = '';
 
-    characterInputs.innerHTML += `
-      <div>
-        <label for="characterName${i}">Character:</label>
-        <input type="text" id="characterName${i}" value="${characterName}">
-        <label for="serverName${i}">Server:</label>
-        <input type="text" id="serverName${i}" value="${serverName}">
-      </div>
-    `;
-  }
-}
+			for (let i = 0; i < 10; i++) {
+				const charName = document.getElementById(`characterName${i}`).value;
+				const server = document.getElementById(`serverName${i}`).value;
 
-createCharacterInputs();
+				if (charName && server) {
+					setCookie(`characterName${i}`, charName);
+					setCookie(`serverName${i}`, server);
 
-async function getWeeklyBestDungeons() {
-  const results = document.getElementById('results');
-  results.innerHTML = '';
+					const url = `https://raider.io/api/v1/characters/profile?region=us&realm=${server}&name=${charName}&fields=mythic_plus_weekly_highest_level_runs`;
 
-  for (let i = 0; i < 10; i++) {
-    const charName = document.getElementById(`characterName${i}`).value;
-    const server = document.getElementById(`serverName${i}`).value;
+					try {
+						const response = await fetch(url);
 
-    if (charName && server) {
-	    setCookie(`characterName${i}`, charName);
-        setCookie(`serverName${i}`, server);
+						if (response.ok) {
+							const data = await response.json();
+							const weeklyHighestRuns = data.mythic_plus_weekly_highest_level_runs.slice(0, 8);
 
-      const url = `https://raider.io/api/v1/characters/profile?region=us&realm=${server}&name=${charName}&fields=mythic_plus_weekly_highest_level_runs`;
+							const colorClass = (weeklyHighestRuns[0]?.mythic_level || 0) >= 18 ? 'orange' : ((weeklyHighestRuns[0]?.mythic_level || 0) >= 11 ? 'blue' : '');
 
-      try {
-        const response = await fetch(url);
-
-        if (response.ok) {
-          const data = await response.json();
-          const weeklyHighestRuns = data.mythic_plus_weekly_highest_level_runs.slice(0, 8);
-		  
-		  const colorClass = (weeklyHighestRuns[0]?.mythic_level || 0) >= 18 ? 'orange' : ((weeklyHighestRuns[0]?.mythic_level || 0) >= 11 ? 'blue' : '');
-
-          results.innerHTML += `
-              <h3>${charName} - ${server}'s Weekly Highest 8 Dungeons:</h3>
-              <ol>
-                ${weeklyHighestRuns.map(run => `<li><span class="m${run.mythic_level}">+${run.mythic_level}</span> ${run.dungeon}</li>`).join('')}
-              </ol>
-          `;
-        } else {
-          const errorMessage = `Error fetching data for ${charName} - ${server}. Status: ${response.status} (${response.statusText})`;
-          console.error(errorMessage);
-          results.innerHTML += `<h3>${errorMessage}</h3>`;
-        }
-      } catch (error) {
-        const errorMessage = `Error fetching data for ${charName} - ${server}. ${error.message}`;
-        console.error(errorMessage);
-        results.innerHTML += `<h3>${errorMessage}</h3>`;
-      }
-    }
-  }
-}
-</script>
+							results.innerHTML += `<h3>${charName} - ${server}'s Weekly Highest 8 Dungeons:</h3><ol>${weeklyHighestRuns.map(run => `<li><span class="m${run.mythic_level}">+${run.mythic_level}</span> ${run.dungeon}</li>`).join('')}</ol>`;
+						} else {
+							const errorMessage = `Error fetching data for ${charName} - ${server}. Status: ${response.status} (${response.statusText})`;
+							console.error(errorMessage);
+							results.innerHTML += `<h3>${errorMessage}</h3>`;
+						}
+					} catch (error) {
+						const errorMessage = `Error fetching data for ${charName} - ${server}. ${error.message}`;
+						console.error(errorMessage);
+						results.innerHTML += `<h3>${errorMessage}</h3>`;
+					}
+				}
+			}
+		}
+	</script>
 </body>
 </html>
