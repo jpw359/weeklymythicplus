@@ -63,7 +63,7 @@ async function getWeeklyBestDungeons() {
           const weeklyHighestRuns = data.mythic_plus_weekly_highest_level_runs.slice(0, 8);
 
           results.innerHTML += `
-            <h3>${charName} - ${server}'s Weekly Highest Level 8 Dungeons:</h3>
+            <h3>${charName} - ${server}'s Weekly Highest 8 Dungeons:</h3>
             <ul>
               ${weeklyHighestRuns.map(run => `<li>${run.dungeon} - ${run.mythic_level}</li>`).join('')}
             </ul>
