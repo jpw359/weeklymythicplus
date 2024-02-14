@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top 8 Weekly Dungeons</title>
+</head>
+<body>
+<h1>Enter Character and Server Information</h1>
+<div id="characterInputs"></div>
+<button onclick="getWeeklyBestDungeons()">Get Weekly Top 8 Dungeons</button>
+<div id="results"></div>
+
+<script>
+function setCookie(name, value) {
+  document.cookie = `${name}=${value};expires=${new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString()};`;
+}
+
+function getCookie(name) {
+  const cookieValue = document.cookie.match(`(^|;)\\s*${name}=([^;]+)`);
+  return cookieValue ? cookieValue.pop() : '';
+}
+
+function createCharacterInputs() {
+  const characterInputs = document.getElementById('characterInputs');
+
+  for (let i = 0; i < 10; i++) {
+    const characterName = getCookie(`characterName${i}`) || '';
+    const serverName = getCookie(`serverName${i}`) || '';
+
+    characterInputs.innerHTML += `
+      <div>
+        <label for="characterName${i}">Character Name:</label>
+        <input type="text" id="characterName${i}" value="${characterName}">
+        <label for="serverName${i}">Server Name:</label>
+        <input type="text" id="serverName${i}" value="${serverName}">
+      </div>
+    `;
+  }
+}
+
+createCharacterInputs();
+
+async function getWeeklyBestDungeons() {
+  const results = document.getElementById('results');
+  results.innerHTML = '';
+
+  for (let i = 0; i < 10; i++) {
+    const charName = document.getElementById(`characterName${i}`).value;
+    const server = document.getElementById(`serverName${i}`).value;
+
+    if (charName && server) {
+      setCookie(`characterName${i}`, charName);
+      setCookie(`serverName${i}`, server);
+
+      const url = `https://raider.io/api/v1/characters/profile?region=us&realm=${server}&name=${charName}&fields=mythic_plus_weekly_highest_level_runs`;
+
+      try {
+        const response = await fetch(url);
+
+        if (response.ok) {
+          const data = await response.json();
+          const weeklyHighestRuns = data.mythic_plus_weekly_highest_level_runs.slice(0, 8);
+
+          results.innerHTML += `
+            <h3>${charName} - ${server}'s Weekly Highest Level 8 Dungeons:</h3>
+            <ul>
+              ${weeklyHighestRuns.map(run => `<li>${run.dungeon} - ${run.mythic_level}</li>`).join('')}
+            </ul>
+          `;
+        } else {
+          const errorMessage = `Error fetching data for ${charName} - ${server}. Status: ${response.status} (${response.statusText})`;
+          console.error(errorMessage);
+          results.innerHTML += `<h3>${errorMessage}</h3>`;
+        }
+      } catch (error) {
+        const errorMessage = `Error fetching data for ${charName} - ${server}. ${error.message}`;
+        console.error(errorMessage);
+        results.innerHTML += `<h3>${errorMessage}</h3>`;
+      }
+    }
+  }
+}
+</script>
+</body>
+</html>
