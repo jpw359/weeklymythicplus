@@ -86,7 +86,7 @@ async function getWeeklyBestDungeons() {
           results.innerHTML += `
               <h3>${charName} - ${server}'s Weekly Highest 8 Dungeons:</h3>
               <ol>
-                ${weeklyHighestRuns.map(run => `<li class="m${run.mythic_level}">+${run.mythic_level} ${run.dungeon}</li>`).join('')}
+                ${weeklyHighestRuns.map(run => `<li><span class="m${run.mythic_level}">+${run.mythic_level}</span> ${run.dungeon}</li>`).join('')}
               </ol>
           `;
         } else {
