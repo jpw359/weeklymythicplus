@@ -61,9 +61,10 @@
 				const charName = document.getElementById(`characterName${i}`).value;
 				const server = document.getElementById(`serverName${i}`).value;
 
+				setCookie(`characterName${i}`, charName);
+				setCookie(`serverName${i}`, server);
+
 				if (charName && server) {
-					setCookie(`characterName${i}`, charName);
-					setCookie(`serverName${i}`, server);
 
 					const url = `https://raider.io/api/v1/characters/profile?region=us&realm=${server}&name=${charName}&fields=mythic_plus_weekly_highest_level_runs`;
 
